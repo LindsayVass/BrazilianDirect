@@ -1,0 +1,3 @@
+*.Rproj*
+csv/*
+py/.ipynb_checkpoints/*
