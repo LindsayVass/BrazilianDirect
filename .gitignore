@@ -2,3 +2,4 @@
 csv/*
 py/.ipynb_checkpoints/*
 cfg/*
+*.pyc
