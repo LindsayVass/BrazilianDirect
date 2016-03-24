@@ -87,7 +87,7 @@ def pre_process_mysql(df):
 	df.loc[df['cust_price'] > 20, 'cust_price'] = np.nan
 
 	# Replace zero values for retail price
-	df.loc[df['retail_price'] == 0, 'retail_price'] = np.nanmax
+	df.loc[df['retail_price'] == 0, 'retail_price'] = np.nan
 
 	# Create a column for whether the quote converted
 	df['converted'] = np.where(df['quote_status'] == 'Converted', 1, 0)
