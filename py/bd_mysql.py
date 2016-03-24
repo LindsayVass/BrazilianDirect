@@ -174,4 +174,52 @@ def pre_process_mysql(df):
 	# relabel ''
 	df.loc[df['construction'] == '', 'construction'] = 'Missing'
 
+	### add regions and divisions for states
+
+	# http://www2.census.gov/geo/pdfs/maps-data/maps/reference/us_regdiv.pdf
+	state_divisions = {}
+	pacific = ['WA', 'OR', 'CA', 'AK', 'HI']
+	mountain = ['MT', 'ID', 'WY', 'NV', 'UT', 'CO', 'AZ', 'NM']
+	west_north_central = ['ND', 'SD', 'NE', 'KS', 'MN', 'IA', 'MO']
+	west_south_central = ['TX', 'OK', 'AR', 'LA']
+	east_north_central = ['WI', 'MI', 'IL', 'IN', 'OH']
+	east_south_central = ['KY', 'TN', 'MS', 'AL']
+	south_atlantic = ['FL', 'GA', 'SC', 'NC', 'VA', 'WV', 'MD', 'DE', 'DC']
+	middle_atlantic = ['NY', 'PA', 'NJ']
+	new_england = ['ME', 'VT', 'NH', 'MA', 'CT', 'RI']
+
+	state_regions = {}
+	west = pacific + mountain
+	midwest = west_north_central + east_north_central
+	south = west_south_central + east_south_central + south_atlantic
+	northeast = middle_atlantic + new_england
+
+	# create divisions dict
+	state_divisions = state_dict(state_divisions, pacific, 'pacific')
+	state_divisions = state_dict(state_divisions, mountain, 'mountain')
+	state_divisions = state_dict(state_divisions, west_north_central, 'west_north_central')
+	state_divisions = state_dict(state_divisions, west_south_central, 'west_south_central')
+	state_divisions = state_dict(state_divisions, east_north_central, 'east_north_central')
+	state_divisions = state_dict(state_divisions, east_south_central, 'east_south_central')
+	state_divisions = state_dict(state_divisions, south_atlantic, 'south_atlantic')
+	state_divisions = state_dict(state_divisions, middle_atlantic, 'middle_atlantic')
+	state_divisions = state_dict(state_divisions, new_england, 'new_england')
+
+	# create regions dict
+	state_regions = state_dict(state_regions, west, 'west')
+	state_regions = state_dict(state_regions, midwest, 'midwest')
+	state_regions = state_dict(state_regions, south, 'south')
+	state_regions = state_dict(state_regions, northeast, 'northeast')
+
+	df['state_division'] = [state_divisions[x] if x in state_divisions else 'Other' for x in df['ship_state']]
+	df['state_region'] = [state_regions[x] if x in state_regions else 'Other' for x in df['ship_state']]
+
+	# exclude the hardwood flooring professionals data that Dan added (quotes have sqft of 777, 877, 677)
+	df = df.loc[df['sq_ft']%10 != 7, :]
+
 	return(df)
+
+def state_dict(the_dict, the_list, region):
+    for state in the_list:
+        the_dict[state] = region
+    return(the_dict)
